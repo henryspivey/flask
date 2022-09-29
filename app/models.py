@@ -47,6 +47,28 @@ class User(UserMixin, db.Model):
         lazy="dynamic",
     )
 
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(self.followers.c.followed_id == user.id).count() > 0
+
+    def followed_posts(self):
+        followed = (
+            Post.query.join(
+                self.followers, (self.followers.c.followed_id == Post.user_id)
+            )
+            .filter(self.followers.c.follower_id == self.id)
+            .order_by(Post.timestamp.desc())
+        )
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own).order_by(Post.timestamp.desc())
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
