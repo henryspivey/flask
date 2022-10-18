@@ -1,5 +1,6 @@
 from ast import Pass, Sub
 from tokenize import String
+from xml.dom.minidom import Text
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
@@ -51,3 +52,11 @@ class EditProfileForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
     submit = SubmitField("submit")
+
+
+class PostForm(FlaskForm):
+    post = TextAreaField(
+        "Say something", validators=[DataRequired(), Length(min=1, max=140)]
+    )
+    submit = SubmitField("Submit")
+    
